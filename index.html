@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Recently Played - Radio Nest</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <style>
+    body {
+      margin: 0;
+      padding: 20px;
+      font-family: "Montserrat", sans-serif;
+      background: transparent;
+    }
+
+    /* Theme variables */
+    :root {
+      --text-color: #fff;
+      --card-bg: rgba(255,255,255,0.15);
+      --glass-blur: blur(12px);
+    }
+
+    .theme-dark {
+      --text-color: #000;
+      --card-bg: rgba(0,0,0,0.25);
+    }
+
+    .theme-light {
+      --text-color: #fff;
+      --card-bg: rgba(255,255,255,0.25);
+    }
+
+    /* Header */
+    .rp-header {
+      font-size: 22px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.12em;
+      margin-bottom: 18px;
+      text-align: center;
+      color: var(--text-color);
+    }
+
+    /* Alignment */
+    .align-left { margin-left: 0; margin-right: auto; }
+    .align-center { margin-left: auto; margin-right: auto; }
+    .align-right { margin-left: auto; margin-right: 0; }
+
+    /* Grid container */
+    #rp-grid {
+      display: grid;
+      gap: 20px;
+      width: 100%;
+    }
+
+    /* Responsive grid */
+    @media (max-width: 480px) {
+      #rp-grid { grid-template-columns: 1fr; }
+    }
+
+    @media (min-width: 481px) and (max-width: 1024px) {
+      #rp-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+
+    @media (min-width: 1025px) {
+      #rp-grid { grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); }
+    }
+
+    /* Card */
+    .rp-card {
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      border-radius: 14px;
+      padding: 12px;
+      text-align: center;
+      transition: transform 0.25s ease, box-shadow 0.25s ease;
+      color: var(--text-color);
+    }
+
+    .rp-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+
+    /* Artwork */
+    .rp-art {
+      width: 100%;
+      border-radius: 12px;
+      aspect-ratio: 1 / 1;
+      object-fit: cover;
+      margin-bottom: 10px;
+    }
+
+    /* Title */
+    .rp-title {
+      font-size: 14px;
+      font-weight: 700;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      color: var(--text-color);
+    }
+
+    /* Timestamp */
+    .rp-time {
+      font-size: 11px;
+      opacity: 0.7;
+      color: var(--text-color);
+    }
+
+    /* Powered by */
+    .powered-by {
+      margin-top: 18px;
+      text-align: center;
+      font-size: 12px;
+    }
+
+    .powered-by a {
+      color: #4da3ff;
+      text-decoration: underline;
+      font-weight: 600;
+    }
+  </style>
+</head>
+
+<body>
+
+<div id="rp-container" class="align-center">
+
+  <div class="rp-header">Recently Played</div>
+
+  <div id="rp-grid"></div>
+
+  <div class="powered-by">
+    <a href="https://myradionest.com" target="_blank">Powered by Radio Nest</a>
+  </div>
+
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const limit = parseInt(params.get("limit")) || 6;
+  const align = params.get("align") || "center";
+  const theme = params.get("theme") || "light"; // NEW
+
+  const container = document.getElementById("rp-container");
+  container.classList.add(`align-${align}`);
+
+  // Apply theme
+  document.body.classList.add(`theme-${theme}`);
+
+  const grid = document.getElementById("rp-grid");
+
+  const WORKER_HISTORY_URL =
+    "https://radiohistoryworker.sthelensliveradio.workers.dev/history";
+
+  function timeAgo(timestamp) {
+    const seconds = Math.floor((Date.now() - timestamp) / 1000);
+
+    if (seconds < 60) return "Just now";
+    if (seconds < 3600) return `${Math.floor(seconds / 60)} min ago`;
+    if (seconds < 86400) return `${Math.floor(seconds / 3600)} hrs ago`;
+
+    return `${Math.floor(seconds / 86400)} days ago`;
+  }
+
+  async function loadHistory() {
+    try {
+      const res = await fetch(WORKER_HISTORY_URL + "?_=" + Date.now());
+      const data = await res.json();
+
+      const history = data.history.slice(0, limit);
+
+      grid.innerHTML = "";
+
+      history.forEach(item => {
+        const card = document.createElement("div");
+        card.className = "rp-card";
+
+        card.innerHTML = `
+          <img class="rp-art" src="${item.art}" alt="">
+          <div class="rp-title">${item.title}</div>
+          <div class="rp-time">${timeAgo(item.timestamp)}</div>
+        `;
+
+        grid.appendChild(card);
+      });
+
+    } catch (err) {
+      grid.innerHTML = `<p style="opacity:0.7;color:var(--text-color);">Unable to load history.</p>`;
+    }
+  }
+
+  loadHistory();
+  setInterval(loadHistory, 15000);
+</script>
+
+</body>
+</html>
