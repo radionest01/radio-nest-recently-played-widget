@@ -57,7 +57,22 @@
     /* Container */
     #rp-container {
       width: 350px; /* MATCHES NOW PLAYING */
-      margin: 0 auto;
+    }
+
+    /* Alignment classes */
+    .align-left {
+      margin-left: 0;
+      margin-right: auto;
+    }
+
+    .align-center {
+      margin-left: auto;
+      margin-right: auto;
+    }
+
+    .align-right {
+      margin-left: auto;
+      margin-right: 0;
     }
 
     /* Horizontal card layout */
@@ -75,7 +90,7 @@
 
     /* Album art */
     .rp-art {
-      width: 60px; /* YOUR CHOICE */
+      width: 60px;
       height: 60px;
       border-radius: 8px;
       object-fit: cover;
@@ -110,6 +125,9 @@
       opacity: 0.8;
       margin-left: 10px;
       white-space: nowrap;
+      display: flex;
+      flex-direction: column;
+      justify-content: center; /* VERTICAL CENTER */
     }
 
     .live-badge {
@@ -149,7 +167,11 @@
 <script>
   const params = new URLSearchParams(window.location.search);
   const limit = parseInt(params.get("limit")) || 3;
+  const align = params.get("align") || "center";
   const theme = params.get("theme") || "light";
+
+  const container = document.getElementById("rp-container");
+  container.classList.add(`align-${align}`);
 
   document.body.classList.add(`theme-${theme}`);
 
