@@ -8,12 +8,11 @@
   <style>
     body {
       margin: 0;
-      padding: 0; /* FIXED GAP ABOVE HEADER */
+      padding: 0;
       font-family: "Montserrat", sans-serif;
       background: transparent;
     }
 
-    /* Theme variables */
     :root {
       --text-color: #fff;
       --card-bg: rgba(255,255,255,0.15);
@@ -30,7 +29,6 @@
       --card-bg: rgba(255,255,255,0.25);
     }
 
-    /* Header */
     .rp-header {
       font-size: 20px;
       font-weight: 700;
@@ -41,7 +39,6 @@
       color: var(--text-color);
     }
 
-    /* Powered by under header */
     .powered-by {
       text-align: center;
       font-size: 12px;
@@ -54,28 +51,14 @@
       font-weight: 600;
     }
 
-    /* Container */
     #rp-container {
-      width: 350px; /* MATCHES NOW PLAYING */
+      width: 350px;
     }
 
-    /* Alignment classes */
-    .align-left {
-      margin-left: 0;
-      margin-right: auto;
-    }
+    .align-left { margin-left: 0; margin-right: auto; }
+    .align-center { margin-left: auto; margin-right: auto; }
+    .align-right { margin-left: auto; margin-right: 0; }
 
-    .align-center {
-      margin-left: auto;
-      margin-right: auto;
-    }
-
-    .align-right {
-      margin-left: auto;
-      margin-right: 0;
-    }
-
-    /* Horizontal card layout */
     .rp-card {
       display: flex;
       align-items: center;
@@ -88,7 +71,6 @@
       color: var(--text-color);
     }
 
-    /* Album art */
     .rp-art {
       width: 60px;
       height: 60px;
@@ -97,7 +79,6 @@
       flex-shrink: 0;
     }
 
-    /* Middle text block */
     .rp-info {
       flex-grow: 1;
       margin-left: 10px;
@@ -117,7 +98,6 @@
       color: var(--text-color);
     }
 
-    /* Right side: Now Playing + time */
     .rp-meta {
       text-align: right;
       font-size: 10px;
@@ -127,7 +107,7 @@
       white-space: nowrap;
       display: flex;
       flex-direction: column;
-      justify-content: center; /* VERTICAL CENTER */
+      justify-content: center;
     }
 
     .live-badge {
@@ -177,8 +157,9 @@
 
   const list = document.getElementById("rp-list");
 
+  // ⭐ FIXED URL — worker returns history at root
   const WORKER_HISTORY_URL =
-    "https://radiohistoryworker.sthelensliveradio.workers.dev/history";
+    "https://radiohistoryworker.sthelensliveradio.workers.dev/";
 
   function timeAgo(timestamp) {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
