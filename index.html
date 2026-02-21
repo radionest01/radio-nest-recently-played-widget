@@ -54,73 +54,64 @@
       font-weight: 600;
     }
 
-    /* Alignment */
-    .align-left { margin-left: 0; margin-right: auto; }
-    .align-center { margin-left: auto; margin-right: auto; }
-    .align-right { margin-left: auto; margin-right: 0; }
-
-    /* Grid container */
-    #rp-grid {
-      display: grid;
-      gap: 10px;
-      width: 100%;
-      max-width: 360px; /* MATCHES NOW PLAYING WIDTH */
-      margin: 0 auto; /* TRUE CENTERING */
-    }
-
-    /* Responsive grid */
-    @media (max-width: 480px) {
-      #rp-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    @media (min-width: 481px) {
-      #rp-grid { grid-template-columns: repeat(3, 1fr); }
-    }
-
-    /* Card */
-    .rp-card {
-      background: var(--card-bg);
-      backdrop-filter: var(--glass-blur);
-      border-radius: 10px;
-      padding: 6px;
-      text-align: center;
-      transition: transform 0.25s ease, box-shadow 0.25s ease;
-      color: var(--text-color);
-      max-width: 110px; /* SMALLER CARDS */
+    /* Container */
+    #rp-container {
+      width: 350px; /* MATCHES NOW PLAYING */
       margin: 0 auto;
     }
 
-    .rp-card:hover {
-      transform: translateY(-3px);
-      box-shadow: 0 6px 18px rgba(0,0,0,0.35);
+    /* Horizontal card layout */
+    .rp-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: var(--card-bg);
+      backdrop-filter: var(--glass-blur);
+      border-radius: 10px;
+      padding: 8px;
+      margin-bottom: 10px;
+      color: var(--text-color);
     }
 
-    /* Artwork */
+    /* Album art */
     .rp-art {
-      width: 100%;
+      width: 60px; /* YOUR CHOICE */
+      height: 60px;
       border-radius: 8px;
-      aspect-ratio: 1 / 1;
       object-fit: cover;
-      margin-bottom: 5px;
+      flex-shrink: 0;
     }
 
-    /* Title */
+    /* Middle text block */
+    .rp-info {
+      flex-grow: 1;
+      margin-left: 10px;
+    }
+
     .rp-title {
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 700;
       text-transform: uppercase;
       margin-bottom: 2px;
       color: var(--text-color);
     }
 
-    /* Timestamp */
-    .rp-time {
-      font-size: 9px;
-      opacity: 0.7;
+    .rp-artist {
+      font-size: 11px;
+      opacity: 0.85;
       color: var(--text-color);
     }
 
-    /* Live Now badge */
+    /* Right side: Live Now + time */
+    .rp-meta {
+      text-align: right;
+      font-size: 10px;
+      color: var(--text-color);
+      opacity: 0.8;
+      margin-left: 10px;
+      white-space: nowrap;
+    }
+
     .live-badge {
       display: inline-block;
       background: rgba(255, 80, 0, 0.9);
@@ -143,7 +134,7 @@
 
 <body>
 
-<div id="rp-container" class="align-center">
+<div id="rp-container">
 
   <div class="rp-header">Recently Played</div>
 
@@ -151,22 +142,18 @@
     <a href="https://myradionest.com" target="_blank">Powered by Radio Nest</a>
   </div>
 
-  <div id="rp-grid"></div>
+  <div id="rp-list"></div>
 
 </div>
 
 <script>
   const params = new URLSearchParams(window.location.search);
   const limit = parseInt(params.get("limit")) || 3;
-  const align = params.get("align") || "center";
   const theme = params.get("theme") || "light";
-
-  const container = document.getElementById("rp-container");
-  container.classList.add(`align-${align}`);
 
   document.body.classList.add(`theme-${theme}`);
 
-  const grid = document.getElementById("rp-grid");
+  const list = document.getElementById("rp-list");
 
   const WORKER_HISTORY_URL =
     "https://radiohistoryworker.sthelensliveradio.workers.dev/history";
@@ -188,7 +175,7 @@
 
       const history = data.history.slice(0, limit);
 
-      grid.innerHTML = "";
+      list.innerHTML = "";
 
       history.forEach((item, index) => {
         const card = document.createElement("div");
@@ -200,16 +187,23 @@
 
         card.innerHTML = `
           <img class="rp-art" src="${item.art}" alt="">
-          <div class="rp-title">${item.title}</div>
-          ${liveBadge}
-          <div class="rp-time">${timeAgo(item.timestamp)}</div>
+          
+          <div class="rp-info">
+            <div class="rp-title">${item.title}</div>
+            <div class="rp-artist">${item.artist || ""}</div>
+          </div>
+
+          <div class="rp-meta">
+            ${liveBadge}
+            <div>${timeAgo(item.timestamp)}</div>
+          </div>
         `;
 
-        grid.appendChild(card);
+        list.appendChild(card);
       });
 
     } catch (err) {
-      grid.innerHTML = `<p style="opacity:0.7;color:var(--text-color);">Unable to load history.</p>`;
+      list.innerHTML = `<p style="opacity:0.7;color:var(--text-color);">Unable to load history.</p>`;
     }
   }
 
