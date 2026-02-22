@@ -11,6 +11,7 @@
       padding: 0;
       font-family: "Montserrat", sans-serif;
       background: transparent;
+      overflow-x: hidden;
     }
 
     :root {
@@ -51,24 +52,32 @@
       font-weight: 600;
     }
 
+    /* ⭐ FIXED: Fully responsive container */
     #rp-container {
-      width: 350px;
+      width: 100%;
+      max-width: 350px;
+      margin: 0 auto;
+      box-sizing: border-box;
+      overflow-x: hidden;
     }
 
     .align-left { margin-left: 0; margin-right: auto; }
     .align-center { margin-left: auto; margin-right: auto; }
     .align-right { margin-left: auto; margin-right: 0; }
 
+    /* ⭐ FIXED: Cards no longer overflow */
     .rp-card {
       display: flex;
       align-items: center;
-      justify-content: space-between;
       background: var(--card-bg);
       backdrop-filter: var(--glass-blur);
       border-radius: 10px;
       padding: 8px;
       margin-bottom: 10px;
       color: var(--text-color);
+      width: 100%;
+      box-sizing: border-box;
+      overflow: hidden;
     }
 
     .rp-art {
@@ -82,6 +91,7 @@
     .rp-info {
       flex-grow: 1;
       margin-left: 10px;
+      min-width: 0; /* ⭐ CRITICAL */
     }
 
     .rp-title {
@@ -90,24 +100,30 @@
       text-transform: uppercase;
       margin-bottom: 2px;
       color: var(--text-color);
+      overflow-wrap: break-word;
     }
 
     .rp-artist {
       font-size: 11px;
       opacity: 0.85;
       color: var(--text-color);
+      overflow-wrap: break-word;
     }
 
+    /* ⭐ FIXED: Meta column now shrinks properly */
     .rp-meta {
-      text-align: right;
       font-size: 10px;
       color: var(--text-color);
       opacity: 0.8;
       margin-left: 10px;
-      white-space: nowrap;
       display: flex;
       flex-direction: column;
-      justify-content: center;
+      align-items: flex-end;
+      flex-shrink: 1;
+      min-width: 0;
+      max-width: 80px;
+      white-space: normal;
+      overflow-wrap: break-word;
     }
 
     .live-badge {
@@ -121,6 +137,7 @@
       margin-bottom: 4px;
       text-transform: uppercase;
       letter-spacing: 0.05em;
+      white-space: nowrap;
     }
 
     .live-badge::before {
@@ -157,7 +174,6 @@
 
   const list = document.getElementById("rp-list");
 
-  // ⭐ FIXED URL — worker returns history at root
   const WORKER_HISTORY_URL =
     "https://radiohistoryworker.sthelensliveradio.workers.dev/";
 
