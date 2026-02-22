@@ -52,7 +52,6 @@
       font-weight: 600;
     }
 
-    /* ⭐ Fully responsive container */
     #rp-container {
       width: 100%;
       max-width: 350px;
@@ -65,7 +64,6 @@
     .align-center { margin-left: auto; margin-right: auto; }
     .align-right { margin-left: auto; margin-right: 0; }
 
-    /* ⭐ Cards never overflow */
     .rp-card {
       display: flex;
       align-items: center;
@@ -88,7 +86,6 @@
       flex-shrink: 0;
     }
 
-    /* ⭐ Text column now contains the badge */
     .rp-info {
       flex-grow: 1;
       margin-left: 10px;
@@ -114,7 +111,6 @@
       overflow-wrap: break-word;
     }
 
-    /* ⭐ Meta now sits UNDER the artist, never overlaps */
     .rp-meta {
       font-size: 10px;
       color: var(--text-color);
@@ -179,6 +175,55 @@
   const WORKER_HISTORY_URL =
     "https://radiohistoryworker.sthelensliveradio.workers.dev/";
 
+  const FALLBACK_ART =
+    "https://i.ibb.co/Jj588RKm/Live-Stream-Default-Album-Art.png";
+
+  function cleanMetadata(str) {
+    if (!str) return "";
+    return str
+      .replace(/\(.*?\)/g, "")
+      .replace(/\[.*?\]/g, "")
+      .replace(/- .*?$/g, "")
+      .replace(/Remaster(ed)?/gi, "")
+      .replace(/Live/gi, "")
+      .replace(/Edit/gi, "")
+      .replace(/Version/gi, "")
+      .replace(/From .*/gi, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }
+
+  async function fetchiTunesArtwork(title, artist) {
+    const cleanedTitle = cleanMetadata(title);
+    const cleanedArtist = cleanMetadata(artist);
+
+    const attempts = [
+      `${cleanedArtist} ${cleanedTitle}`,
+      cleanedTitle,
+      cleanedArtist
+    ];
+
+    for (const query of attempts) {
+      const url = `https://itunes.apple.com/search?term=${encodeURIComponent(query)}&entity=song&limit=1`;
+
+      try {
+        const res = await fetch(url);
+        const data = await res.json();
+
+        if (data.results && data.results.length > 0) {
+          return data.results[0].artworkUrl100.replace("100x100", "600x600");
+        }
+      } catch (e) {}
+    }
+
+    return FALLBACK_ART;
+  }
+
+  async function getArtwork(item) {
+    if (item.art && item.art !== "") return item.art;
+    return await fetchiTunesArtwork(item.title, item.artist);
+  }
+
   function timeAgo(timestamp) {
     const seconds = Math.floor((Date.now() - timestamp) / 1000);
 
@@ -198,7 +243,10 @@
 
       list.innerHTML = "";
 
-      history.forEach((item, index) => {
+      for (let index = 0; index < history.length; index++) {
+        const item = history[index];
+        const art = await getArtwork(item);
+
         const card = document.createElement("div");
         card.className = "rp-card";
 
@@ -207,7 +255,7 @@
           : "";
 
         card.innerHTML = `
-          <img class="rp-art" src="${item.art}" alt="">
+          <img class="rp-art" src="${art}" alt="">
           
           <div class="rp-info">
             <div class="rp-title">${item.title}</div>
@@ -221,7 +269,7 @@
         `;
 
         list.appendChild(card);
-      });
+      }
 
     } catch (err) {
       list.innerHTML = `<p style="opacity:0.7;color:var(--text-color);">Unable to load history.</p>`;
