@@ -52,7 +52,7 @@
       font-weight: 600;
     }
 
-    /* ⭐ FIXED: Fully responsive container */
+    /* ⭐ Fully responsive container */
     #rp-container {
       width: 100%;
       max-width: 350px;
@@ -65,7 +65,7 @@
     .align-center { margin-left: auto; margin-right: auto; }
     .align-right { margin-left: auto; margin-right: 0; }
 
-    /* ⭐ FIXED: Cards no longer overflow */
+    /* ⭐ Cards never overflow */
     .rp-card {
       display: flex;
       align-items: center;
@@ -88,10 +88,14 @@
       flex-shrink: 0;
     }
 
+    /* ⭐ Text column now contains the badge */
     .rp-info {
       flex-grow: 1;
       margin-left: 10px;
-      min-width: 0; /* ⭐ CRITICAL */
+      min-width: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
     }
 
     .rp-title {
@@ -110,20 +114,18 @@
       overflow-wrap: break-word;
     }
 
-    /* ⭐ FIXED: Meta column now shrinks properly */
+    /* ⭐ Meta now sits UNDER the artist, never overlaps */
     .rp-meta {
       font-size: 10px;
       color: var(--text-color);
       opacity: 0.8;
-      margin-left: 10px;
+      margin-top: 4px;
       display: flex;
       flex-direction: column;
-      align-items: flex-end;
-      flex-shrink: 1;
-      min-width: 0;
-      max-width: 80px;
+      align-items: flex-start;
       white-space: normal;
       overflow-wrap: break-word;
+      max-width: 100%;
     }
 
     .live-badge {
@@ -210,11 +212,11 @@
           <div class="rp-info">
             <div class="rp-title">${item.title}</div>
             <div class="rp-artist">${item.artist || ""}</div>
-          </div>
 
-          <div class="rp-meta">
-            ${liveBadge}
-            <div>${timeAgo(item.timestamp)}</div>
+            <div class="rp-meta">
+              ${liveBadge}
+              <div>${timeAgo(item.timestamp)}</div>
+            </div>
           </div>
         `;
 
